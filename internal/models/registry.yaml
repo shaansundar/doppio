@@ -1,0 +1,184 @@
+# doppio model registry.
+#
+# Licenses were checked on 2026-11-13 against the Hugging Face model card
+# metadata (cardData.license) and the upstream GitHub LICENSE. Re-verify when
+# bumping a revision. `commercial: false` models are hidden unless the license
+# policy is "any" (doppio analyze --allow-noncommercial).
+#
+# status: available = wired to a pipeline stage; planned = registered for
+# license visibility, stage arrives in a later phase.
+# memory_gb is a resident-memory estimate used for eviction, not a measurement.
+version: 1
+models:
+  - id: moge2-vits-normal
+    task: geometry
+    family: moge2
+    status: available
+    hf_repo: Ruicheng/moge-2-vits-normal
+    revision: 26b477f41595707c5db6770294c0d1721e8ed4ed
+    filename: model.pt
+    size_bytes: 140550416
+    memory_gb: 0.5
+    license: {id: MIT, commercial: true, url: "https://huggingface.co/Ruicheng/moge-2-vits-normal"}
+  - id: moge2-vitb-normal
+    task: geometry
+    family: moge2
+    status: available
+    hf_repo: Ruicheng/moge-2-vitb-normal
+    revision: ca5f0e07ff01d3e5a364c1d954ed12ee1814b368
+    filename: model.pt
+    size_bytes: 419110160
+    memory_gb: 1.0
+    license: {id: MIT, commercial: true, url: "https://huggingface.co/Ruicheng/moge-2-vitb-normal"}
+  - id: moge2-vitl-normal
+    task: geometry
+    family: moge2
+    status: available
+    hf_repo: Ruicheng/moge-2-vitl-normal
+    revision: cb0e8bbd6b1e243589717c78e750b1ba4c093acf
+    filename: model.pt
+    size_bytes: 1323815904
+    memory_gb: 2.0
+    license: {id: MIT, commercial: true, url: "https://huggingface.co/Ruicheng/moge-2-vitl-normal"}
+
+  # --- planned: calibration -------------------------------------------------
+  - id: geocalib-pinhole
+    task: calibration
+    family: geocalib
+    status: planned
+    url: "https://github.com/cvg/GeoCalib/releases/download/v1.0/geocalib-pinhole.tar"
+    size_bytes: 116074121
+    memory_gb: 0.4
+    license: {id: Apache-2.0, commercial: true, url: "https://github.com/cvg/GeoCalib/blob/main/LICENSE"}
+
+  # --- planned: segmentation ------------------------------------------------
+  - id: florence2-base
+    task: detection
+    family: florence2
+    status: planned
+    hf_repo: microsoft/Florence-2-base
+    revision: 5ca5edf5bd017b9919c05d08aebef5e4c7ac3bac
+    filename: model.safetensors
+    size_bytes: 463221266
+    memory_gb: 1.0
+    license: {id: MIT, commercial: true, url: "https://huggingface.co/microsoft/Florence-2-base"}
+  - id: florence2-large
+    task: detection
+    family: florence2
+    status: planned
+    hf_repo: microsoft/Florence-2-large
+    revision: 21a599d414c4d928c9032694c424fb94458e3594
+    filename: model.safetensors
+    size_bytes: 1553563458
+    memory_gb: 3.0
+    license: {id: MIT, commercial: true, url: "https://huggingface.co/microsoft/Florence-2-large"}
+  - id: sam2.1-hiera-small
+    task: segmentation
+    family: sam2
+    status: planned
+    hf_repo: facebook/sam2.1-hiera-small
+    revision: ee5bba1d82bb8749febdf90f45e84b687142ba03
+    filename: model.safetensors
+    size_bytes: 184305280
+    memory_gb: 0.6
+    license: {id: Apache-2.0, commercial: true, url: "https://huggingface.co/facebook/sam2.1-hiera-small"}
+  - id: sam2.1-hiera-base-plus
+    task: segmentation
+    family: sam2
+    status: planned
+    hf_repo: facebook/sam2.1-hiera-base-plus
+    revision: b7320756a13354e7530a63935656d35b2f91a290
+    filename: model.safetensors
+    size_bytes: 323476296
+    memory_gb: 0.8
+    license: {id: Apache-2.0, commercial: true, url: "https://huggingface.co/facebook/sam2.1-hiera-base-plus"}
+  - id: sam2.1-hiera-large
+    task: segmentation
+    family: sam2
+    status: planned
+    hf_repo: facebook/sam2.1-hiera-large
+    revision: 665f8e2ad61cf5f53d65644ff27c8ee525124610
+    filename: model.safetensors
+    size_bytes: 897897416
+    memory_gb: 1.6
+    license: {id: Apache-2.0, commercial: true, url: "https://huggingface.co/facebook/sam2.1-hiera-large"}
+
+  # --- planned: alternative geometry ----------------------------------------
+  - id: da3-metric-large
+    task: geometry
+    family: da3
+    status: planned
+    hf_repo: depth-anything/DA3METRIC-LARGE
+    revision: 4010e39f3634a45bc60553321fb49fb760bd594e
+    filename: model.safetensors
+    size_bytes: 1336734448
+    memory_gb: 2.0
+    license: {id: Apache-2.0, commercial: true, url: "https://huggingface.co/depth-anything/DA3METRIC-LARGE"}
+
+  # --- planned: multi-view --------------------------------------------------
+  - id: map-anything-apache
+    task: multiview
+    family: mapanything
+    status: planned
+    hf_repo: facebook/map-anything-apache
+    revision: 00f9c245bbcb60522d1ed7f9e9d88462c6e3f38a
+    filename: model.safetensors
+    size_bytes: 4914062480
+    memory_gb: 6.0
+    license: {id: Apache-2.0, commercial: true, url: "https://huggingface.co/facebook/map-anything-apache"}
+  - id: vggt-1b-commercial
+    task: multiview
+    family: vggt
+    status: planned
+    hf_repo: facebook/VGGT-1B-Commercial
+    revision: ebb29a532abe92960eeb6903a5530f16990ef4ab
+    filename: model.safetensors
+    size_bytes: 5026367224
+    memory_gb: 6.0
+    license:
+      id: LicenseRef-vggt-aup
+      commercial: true
+      gated: true
+      url: "https://huggingface.co/facebook/VGGT-1B-Commercial"
+      notes: "Custom license with an acceptable-use policy (no military use); access requires manual approval."
+
+  # --- opt-in: non-commercial / restricted ----------------------------------
+  - id: da3-large-anyview
+    task: multiview
+    family: da3
+    status: planned
+    hf_repo: depth-anything/DA3-LARGE
+    revision: c54c26b16ec04d218e8d584ecf4bce082a9fcc20
+    filename: model.safetensors
+    size_bytes: 1643843860
+    memory_gb: 2.5
+    license: {id: CC-BY-NC-4.0, commercial: false, url: "https://huggingface.co/depth-anything/DA3-LARGE"}
+  - id: depth-pro
+    task: geometry
+    family: depthpro
+    status: planned
+    hf_repo: apple/DepthPro
+    revision: ccd1350a774eb2248bcdfb3be430e38f1d3087ef
+    filename: depth_pro.pt
+    size_bytes: 1904446787
+    memory_gb: 3.0
+    license:
+      id: LicenseRef-apple-amlr
+      commercial: false
+      url: "https://huggingface.co/apple/DepthPro"
+      notes: "Apple Machine Learning Research license; research use only."
+  - id: sam3
+    task: segmentation
+    family: sam3
+    status: planned
+    hf_repo: facebook/sam3
+    revision: 3c879f39826c281e95690f02c7821c4de09afae7
+    filename: model.safetensors
+    size_bytes: 3439938512
+    memory_gb: 4.0
+    license:
+      id: LicenseRef-sam-license
+      commercial: false
+      gated: true
+      url: "https://huggingface.co/facebook/sam3"
+      notes: "Custom SAM License with use restrictions; gated. Treated as restricted until reviewed."
