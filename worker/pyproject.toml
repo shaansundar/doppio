@@ -1,0 +1,53 @@
+[project]
+name = "doppio-worker"
+version = "0.1.0"
+description = "Inference worker for doppio: monocular 3D spatial context for image editing models"
+requires-python = ">=3.11,<3.14"
+license = "MIT"
+dependencies = [
+  "grpcio>=1.66",
+  "protobuf>=5.28",
+  "numpy>=1.26",
+  "pillow>=10.4",
+  "pillow-heif>=0.18",
+  # MoGe pulls opencv-python; do not add opencv-python-headless (same cv2 module).
+  "opencv-python>=4.10",
+  "torch>=2.5",
+  "torchvision>=0.20",
+  "huggingface-hub>=0.25",
+]
+
+[project.optional-dependencies]
+# Geometry backends are optional so the worker core installs from PyPI alone.
+# MoGe-2 (v2.0.0) is pinned to the last commit before MoGe-3, whose main branch
+# depends on CUDA-only flex-gemm and does not target macOS. MoGe itself pulls
+# utils3d and pipeline from GitHub at pinned commits.
+geometry-moge = [
+  "moge @ git+https://github.com/microsoft/MoGe.git@07444410f1e33f402353b99d6ccd26bd31e469e8",
+]
+
+[project.scripts]
+doppio-worker = "doppio_worker.cli:main"
+
+[dependency-groups]
+dev = [
+  "pytest>=8.3",
+  "grpcio-tools>=1.66",
+  "pyyaml>=6.0",
+]
+
+[build-system]
+requires = ["hatchling>=1.25"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/doppio_worker"]
+
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = [
+  "model: requires downloaded model weights (deselect with -m 'not model')",
+]
