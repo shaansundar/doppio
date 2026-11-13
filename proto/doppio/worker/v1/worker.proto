@@ -1,0 +1,104 @@
+syntax = "proto3";
+
+// Contract between the Go orchestrator (doppio serve) and the Python
+// inference worker (doppio-worker). Large arrays never cross this boundary:
+// the worker writes artifacts into `out_dir` and returns relative paths.
+package doppio.worker.v1;
+
+option go_package = "github.com/shaansundar/doppio/gen/go/doppio/worker/v1;workerv1";
+
+service WorkerService {
+  // Health reports worker readiness, compute device and supported stages.
+  rpc Health(HealthRequest) returns (HealthResponse);
+  // RunStage executes one pipeline stage, streaming progress then one result.
+  rpc RunStage(RunStageRequest) returns (stream RunStageResponse);
+  // ListResident lists models currently loaded in worker memory.
+  rpc ListResident(ListResidentRequest) returns (ListResidentResponse);
+  // UnloadModel evicts a resident model.
+  rpc UnloadModel(UnloadModelRequest) returns (UnloadModelResponse);
+}
+
+message HealthRequest {}
+
+message HealthResponse {
+  string worker_version = 1;
+  // Compute device in use: "mps", "cuda" or "cpu".
+  string device = 2;
+  string torch_version = 3;
+  repeated string stages = 4;
+}
+
+// ModelSpec is resolved by the Go registry; the worker trusts it verbatim.
+message ModelSpec {
+  string id = 1;
+  // Loader family, e.g. "moge2".
+  string family = 2;
+  string hf_repo = 3;
+  // Pinned commit revision of the Hugging Face repo.
+  string revision = 4;
+  string filename = 5;
+  double memory_gb = 6;
+}
+
+message RunStageRequest {
+  // Stage name, e.g. "ingest", "geometry", "maps".
+  string stage = 1;
+  // Logical input name -> absolute file path produced by an upstream stage.
+  map<string, string> inputs = 2;
+  // Stage-specific parameters as a JSON object.
+  string params_json = 3;
+  // Empty when the stage needs no model.
+  ModelSpec model = 4;
+  // Absolute, empty, writable directory for this stage's artifacts.
+  string out_dir = 5;
+}
+
+message RunStageResponse {
+  oneof event {
+    StageProgress progress = 1;
+    StageResult result = 2;
+  }
+}
+
+message StageProgress {
+  // 0..1 within the stage.
+  float fraction = 1;
+  string message = 2;
+}
+
+message Artifact {
+  // Logical name used by downstream stages, e.g. "depth".
+  string name = 1;
+  // Path relative to out_dir.
+  string rel_path = 2;
+  string media_type = 3;
+  repeated int64 shape = 4;
+  string dtype = 5;
+}
+
+message StageResult {
+  repeated Artifact artifacts = 1;
+  // Stage-specific metadata as a JSON object.
+  string metadata_json = 2;
+  double elapsed_seconds = 3;
+}
+
+message ListResidentRequest {}
+
+message ResidentModel {
+  string model_id = 1;
+  double memory_gb = 2;
+  double last_used_unix = 3;
+}
+
+message ListResidentResponse {
+  repeated ResidentModel models = 1;
+}
+
+message UnloadModelRequest {
+  string model_id = 1;
+}
+
+message UnloadModelResponse {
+  bool unloaded = 1;
+}
