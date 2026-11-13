@@ -1,0 +1,35 @@
+name: Feature request
+description: Suggest a capability, integration, model or template
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What are you trying to do?
+      description: The editing or generation workflow, and which model or tool you send doppio output to.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: What would help?
+      description: Output format, CLI flag, API endpoint, integration or template.
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Geometry / camera / depth
+        - Scene understanding (planes, objects)
+        - Output formats / adapters
+        - Integrations (MCP, ComfyUI, Photoshop)
+        - Prompt or workflow templates
+        - Performance
+        - Other
+  - type: textarea
+    id: model
+    attributes:
+      label: Proposing a model?
+      description: Link the model card and its weights license. doppio defaults to commercially usable models.

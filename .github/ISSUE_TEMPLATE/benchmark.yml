@@ -1,0 +1,23 @@
+name: Benchmark results
+description: Share doppio numbers from your hardware
+labels: [benchmark]
+body:
+  - type: input
+    id: hardware
+    attributes:
+      label: Hardware
+      placeholder: e.g. M3 Max 64 GB, RTX 4090 + Ryzen 9 7950X
+    validations:
+      required: true
+  - type: textarea
+    id: table
+    attributes:
+      label: Output of `uv run python -m doppio_worker.bench`
+      render: markdown
+    validations:
+      required: true
+  - type: textarea
+    id: json
+    attributes:
+      label: bench.json (from `--json bench.json`)
+      render: json

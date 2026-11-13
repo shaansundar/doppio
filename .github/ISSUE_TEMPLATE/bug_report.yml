@@ -1,0 +1,55 @@
+name: Bug report
+description: Something doesn't work as documented
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting! Please don't attach private photos; a public or synthetic image that reproduces the issue is best.
+        Security issues go to private vulnerability reporting (see SECURITY.md), not here.
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: What you ran, what you expected, and what you got instead.
+      placeholder: "`doppio analyze room.jpg --preset fast` failed with ..."
+    validations:
+      required: true
+  - type: textarea
+    id: doctor
+    attributes:
+      label: "`doppio doctor` output"
+      render: text
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant logs
+      description: The last 50 lines of `~/Library/Application Support/doppio/logs/doppio.log` (Linux - `~/.config/doppio/logs/doppio.log`).
+      render: text
+  - type: input
+    id: version
+    attributes:
+      label: doppio version
+      placeholder: output of `doppio version`
+    validations:
+      required: true
+  - type: dropdown
+    id: platform
+    attributes:
+      label: Platform
+      options:
+        - macOS, Apple Silicon
+        - macOS, Intel
+        - Linux, NVIDIA GPU
+        - Linux, CPU only
+        - Windows
+        - Other
+    validations:
+      required: true
+  - type: input
+    id: hardware
+    attributes:
+      label: Hardware
+      placeholder: e.g. M4, 16 GB
