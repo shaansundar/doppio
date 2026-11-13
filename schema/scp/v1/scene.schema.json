@@ -1,0 +1,75 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://doppio.local/schema/scp/v1/scene.schema.json",
+  "title": "doppio scene description",
+  "description": "Structured 3D context for one image. Pixel coordinates refer to the working image (image.width x image.height). Later v1 minor versions add optional blocks (horizon, vanishing_points, planes, objects, relations); consumers must ignore unknown fields.",
+  "type": "object",
+  "required": ["schema", "image", "conventions", "camera", "depth_stats", "quality"],
+  "properties": {
+    "schema": {"const": "doppio.scene/v1"},
+    "image": {
+      "type": "object",
+      "required": ["width", "height", "sha256"],
+      "additionalProperties": false,
+      "properties": {
+        "width": {"type": "integer", "minimum": 1},
+        "height": {"type": "integer", "minimum": 1},
+        "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      }
+    },
+    "conventions": {
+      "type": "object",
+      "required": ["camera_frame", "units", "image_origin", "depth_map", "normal_map", "invalid_value"],
+      "additionalProperties": {"type": "string"},
+      "properties": {
+        "camera_frame": {"type": "string"},
+        "units": {"const": "meters"},
+        "image_origin": {"type": "string"},
+        "depth_map": {"type": "string"},
+        "normal_map": {"type": "string"},
+        "invalid_value": {"type": "string"}
+      }
+    },
+    "camera": {
+      "type": "object",
+      "required": ["model", "fx", "fy", "cx", "cy", "fov_x_deg", "fov_y_deg", "focal_35mm_equiv", "source", "k"],
+      "additionalProperties": false,
+      "properties": {
+        "model": {"const": "pinhole"},
+        "fx": {"type": "number", "exclusiveMinimum": 0},
+        "fy": {"type": "number", "exclusiveMinimum": 0},
+        "cx": {"type": "number"},
+        "cy": {"type": "number"},
+        "fov_x_deg": {"type": "number", "exclusiveMinimum": 0, "exclusiveMaximum": 180},
+        "fov_y_deg": {"type": "number", "exclusiveMinimum": 0, "exclusiveMaximum": 180},
+        "focal_35mm_equiv": {"type": "number", "minimum": 0},
+        "source": {"enum": ["model", "exif+model"], "description": "model: FOV estimated from pixels; exif+model: FOV fixed from EXIF, depth from the model."},
+        "k": {
+          "type": "array", "minItems": 3, "maxItems": 3,
+          "items": {"type": "array", "minItems": 3, "maxItems": 3, "items": {"type": "number"}}
+        }
+      }
+    },
+    "depth_stats": {
+      "type": "object",
+      "required": ["valid_fraction", "likely_sky"],
+      "additionalProperties": false,
+      "properties": {
+        "near_m": {"type": "number", "minimum": 0, "description": "1st percentile of valid depth"},
+        "median_m": {"type": "number", "minimum": 0},
+        "far_m": {"type": "number", "minimum": 0, "description": "99th percentile of valid depth"},
+        "valid_fraction": {"type": "number", "minimum": 0, "maximum": 1},
+        "likely_sky": {"type": "boolean"}
+      }
+    },
+    "quality": {
+      "type": "object",
+      "required": ["metric_scale", "warnings"],
+      "additionalProperties": false,
+      "properties": {
+        "metric_scale": {"type": "boolean", "description": "True when depths are estimated in meters rather than relative units."},
+        "warnings": {"type": "array", "items": {"type": "string"}}
+      }
+    }
+  }
+}

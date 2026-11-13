@@ -1,0 +1,55 @@
+{
+  "schema": "doppio.scene/v1",
+  "image": {
+    "width": 1024,
+    "height": 768,
+    "sha256": "df6040aa463ea73ff397ea7ab368c1e2a2618a152473ae4d51835e60ca84834d"
+  },
+  "conventions": {
+    "camera_frame": "opencv: x right, y down, z forward",
+    "units": "meters",
+    "image_origin": "top-left, pixels",
+    "depth_map": "inverse depth, robust-percentile normalized, near=bright, invalid=0",
+    "normal_map": "opengl: R=+x right, G=+y up, B=+z toward viewer, invalid=0",
+    "invalid_value": "NaN in .npy arrays"
+  },
+  "camera": {
+    "model": "pinhole",
+    "fx": 731.2118,
+    "fy": 731.2118,
+    "cx": 512.0,
+    "cy": 384.0,
+    "fov_x_deg": 70.0,
+    "fov_y_deg": 55.4129,
+    "focal_35mm_equiv": 24.7165,
+    "source": "model",
+    "k": [
+      [
+        731.2118,
+        0,
+        512.0
+      ],
+      [
+        0,
+        731.2118,
+        384.0
+      ],
+      [
+        0,
+        0,
+        1
+      ]
+    ]
+  },
+  "depth_stats": {
+    "near_m": 2.2035,
+    "median_m": 4.7279,
+    "far_m": 7.1196,
+    "valid_fraction": 0.9598,
+    "likely_sky": true
+  },
+  "quality": {
+    "metric_scale": true,
+    "warnings": []
+  }
+}
