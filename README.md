@@ -35,6 +35,7 @@ machine, and only commercially licensed models are used unless you opt in.
 
 - [Why doppio](#why-doppio)
 - [Features](#features)
+- [Showcase: editing with and without doppio](#showcase-editing-with-and-without-doppio)
 - [Quick start](#quick-start)
 - [Install with an AI assistant](#install-with-an-ai-assistant)
 - [Requirements and resource usage](#requirements-and-resource-usage)
@@ -81,6 +82,182 @@ brings that data to AI workflows:
 | Point cloud / GLB / USD export, metric measure and placement queries | 🔜 Phase 4 |
 | MCP server · ComfyUI nodes · Photoshop panel | 🔜 Phases 5–7 |
 | Multi-view reconstruction from several photos (MapAnything, Apache-2.0) | 🔜 Phase 8 |
+
+## Showcase: editing with and without doppio
+
+We gave two AI agents the same 10 editing jobs. Each job was a photo with a hard
+spatial layout and a request to add objects at specific places and real-world
+sizes. Both agents were Claude Sonnet 5.5 with identical instructions, and both
+made exactly one call to the same image editor, `gemini-2.5-flash-image`. The
+only difference: one agent could run doppio, and the other worked from the photo
+alone. A blind judge model compared each pair of results.
+
+**Short version: on this test, doppio did not make the editor better on average.**
+The judge preferred the doppio agent's edit for 4 photos and the photo-only
+agent's for 3, and couldn't decide on 3. Mean overall scores were identical (5.5
+out of 10). doppio's edits were clearly better when the hard part was distance:
+where in the room something goes and how big it should be at that depth. They
+were worse when the editor misread the measured placement. Using doppio added 7%
+to the cost of an edit ($0.015) and 12 seconds.
+
+### Where doppio helped
+
+**Living room.** *"Add a 1.5 m black floor lamp between the left armchair and
+the left sofa, and a ginger cat asleep under the coffee table."* doppio measured
+the gap at 3.8–4.2 m from the camera, so the lamp stands behind the sofa in the
+gap. Without doppio, the lamp ended up in front of the sofa. The judge picked the
+doppio edit in both orders.
+
+![Living room: original, doppio depth map, edit without doppio, edit with doppio](docs/assets/showcase/01-living-room.jpg)
+
+**Restaurant.** *"Add a waiter halfway back into the room, partly hidden behind
+the chairs of a nearer table, and a bottle of red wine on the nearest table."*
+doppio put the aisle 6.4 m away, so the waiter is smaller and further back.
+Without doppio, he is too large and stands in front of the chairs. The judge
+picked the doppio edit in both orders.
+
+![Restaurant: original, doppio depth map, edit without doppio, edit with doppio](docs/assets/showcase/05-restaurant.jpg)
+
+### Where it didn't
+
+**Alley.** *"Place a 0.6 m wheelbarrow halfway up the alley against the right-hand
+wall, and a black cat sitting on top of the left-hand wall near the front."* The
+doppio agent described the cat's spot as a wall top 8.5 m away, partly behind a
+roof edge, and the editor drew the cat clinging to the wall's vertical face. The
+judge picked the photo-only edit in both orders, and also preferred its
+wheelbarrow's scale and perspective.
+
+![Alley: original, doppio depth map, edit without doppio, edit with doppio](docs/assets/showcase/06-alley.jpg)
+
+<details>
+<summary>All 10 photos, with the judge's verdict</summary>
+
+| Photo | Judge | What decided it |
+|---|---|---|
+| 01 Living room | with doppio | Lamp in the sofa–armchair gap instead of in front of the sofa |
+| 02 Library | split | Neither put the librarian two-thirds of the way back; both have scale problems |
+| 03 Abandoned hall | split | Similar placements; the judge traded the lighting of one against the perspective of the other |
+| 04 Station plaza | without doppio | The photo-only bus sits behind the barriers and cars; the doppio bus covers foreground objects |
+| 05 Restaurant | with doppio | Waiter at the right depth and size, partly behind chairs |
+| 06 Alley | without doppio | doppio edit's cat clings to the wall face |
+| 07 Hotel corridor | with doppio | Woman far down the corridor (doppio measured 17.5 m) and cart on the rug; the photo-only woman walks sideways in the wrong place |
+| 08 Courtyard | split | The doppio statue is better lit but too large and crowds the flower bed |
+| 09 Wide-angle house | with doppio | Rocking chair with correct floor contact; the photo-only edit distorts the fan |
+| 10 Classroom | without doppio | The doppio edit has the right row but adds an oversized open book and looks pasted in |
+
+![Library](docs/assets/showcase/02-library.jpg)
+![Abandoned hall](docs/assets/showcase/03-station-hall-sanatorium.jpg)
+![Station plaza](docs/assets/showcase/04-station-plaza.jpg)
+![Hotel corridor](docs/assets/showcase/07-hotel-corridor.jpg)
+![Courtyard](docs/assets/showcase/08-courtyard.jpg)
+![Wide-angle house](docs/assets/showcase/09-wide-angle-house.jpg)
+![Classroom](docs/assets/showcase/10-classroom.jpg)
+
+</details>
+
+### Judge scores
+
+The judge, `gemini-3.1-pro-preview`, saw the original, the request and the two
+edits labelled only A and B. It didn't know which agent made which, or that
+doppio exists. Each pair was judged twice with the order swapped. An edit wins a
+photo only if it wins both times; otherwise the photo is "split".
+
+| Verdict | Photos |
+|---|---|
+| With doppio wins | 4 |
+| Without doppio wins | 3 |
+| Split (the judge changed its mind when the order was swapped) | 3 |
+
+| Criterion (mean of 20 judgments, 1–10) | Without doppio | With doppio | Change |
+|---|---|---|---|
+| Instruction following | 5.8 | 6.0 | +0.2 |
+| Placement and contact | 6.0 | 5.5 | −0.4 |
+| Scale | 5.8 | 5.5 | −0.2 |
+| Perspective | 6.0 | 6.0 | 0.0 |
+| Occlusion | 6.5 | 6.4 | 0.0 |
+| Lighting and shadows | 6.1 | 5.8 | −0.2 |
+| Preservation of the rest of the photo | 6.7 | 7.2 | +0.6 |
+| **Overall** | **5.5** | **5.5** | **0.0** |
+
+### What it cost
+
+Averages per edit. Token counts are exact: Claude's from the agents' transcripts,
+Gemini's from the API's usage metadata. Costs use API list prices on 2026-11-13.
+
+| Per edit | Without doppio | With doppio | Change |
+|---|---|---|---|
+| Claude input tokens (mostly cache reads) | 201,823 | 303,798 | +51% |
+| Claude output tokens | 2,662 | 3,244 | +22% |
+| Claude API requests | 4.0 | 5.7 | +42% |
+| Claude cost | $0.157 | $0.172 | +9% |
+| Gemini input tokens | 775 | 1,374 | +77% |
+| Gemini output tokens (one image) | 1,290 | 1,290 | 0% |
+| Gemini cost | $0.0389 | $0.0391 | +0.5% |
+| **Total cost** | **$0.196** | **$0.211** | **+7%** |
+| Agent time | 35 s | 46 s | +12 s |
+| doppio analysis (Apple M4, `standard` preset) | | 2.6 s | |
+
+Most of the extra cost is the agent's extra steps: running doppio, reading
+`scene.json` and measuring distances re-sends its context, mostly from cache.
+The depth map adds about 600 input tokens to the Gemini call, which is almost
+free next to the output image. Judging all 10 pairs cost $0.73.
+
+### How the test worked
+
+- **Photos:** 10 openly licensed photos from Wikimedia Commons, chosen for hard
+  geometry: wide-angle lenses, long depth, occlusion, slopes and reflective floors.
+- **Requests:** one per photo, written before any agent ran, naming real-world
+  sizes so scale can be checked
+  ([`requests.json`](scripts/showcase/requests.json)).
+- **Agents:** two Claude Sonnet 5.5 subagents per photo, in Claude Code, with
+  briefs that differ only in one rule
+  ([`agent_brief.md`](scripts/showcase/agent_brief.md)). The doppio agent followed
+  doppio's [agent workflow](templates/prompts/agent-system-prompt.md): `doppio
+  analyze --preset standard`, read `scene.json`, build the prompt with
+  [`build-prompt.sh`](templates/scripts/build-prompt.sh), and attach
+  `depth_inv8.png`.
+- **Editor:** `gemini-2.5-flash-image`, one call per edit, no retries, inputs
+  resized to 1536 px for both agents. Neither agent saw its result.
+- **Judge:** blind and pairwise as described above, with a fixed rubric
+  ([`judge.py`](scripts/showcase/judge.py)).
+
+**Caveats.**
+- **Sample size:** with 10 photos and one edit per agent, these results are anecdotes, not statistics.
+- **One editor:** the test used one instruction editor, which treats the depth map as a hint. Diffusion pipelines that take depth as a hard ControlNet condition, doppio's main target, weren't tested.
+- **Model judge:** the judge is a model, and it changed its verdict when the order was swapped in 3 of the 10 photos.
+- **Agent model:** a pilot on photo 01 with Claude Opus 5.5 agents cost about $1.75 per agent, so the full run used Sonnet 5.5.
+
+**Reproduce.** You need a working doppio (`bin/doppio doctor`), `GEMINI_API_TOKEN`
+or `GOOGLE_AI_API_KEY`, and an agent runner such as Claude Code:
+
+```sh
+python3 scripts/showcase/fetch_cases.py      # photos and licenses into ./showcase (git-ignored)
+python3 scripts/showcase/prepare_runs.py     # one brief.md per photo and agent
+# Run one agent per brief: "Read <brief.md> and carry it out exactly."
+worker/.venv/bin/python scripts/showcase/judge.py
+worker/.venv/bin/python scripts/showcase/report.py   # tables, local gallery.html, README images
+```
+
+<details>
+<summary>Photo credits</summary>
+
+All photos are from Wikimedia Commons. The showcase images are edited versions
+(AI-added objects, and a depth map rendered by doppio).
+
+| Photo | Author | License |
+|---|---|---|
+| [Living room, Edifício Zaher, Rio de Janeiro](https://commons.wikimedia.org/wiki/File:Living_room_in_apartment_of_Condom%C3%ADnio_do_Edif%C3%ADcio_Zaher,_Le_Blond,_Rio_de_Janeiro,_Brazil.jpg) | Wilfredor | [CC0](https://creativecommons.org/publicdomain/zero/1.0/) |
+| [NYC Public Library Research Room](https://commons.wikimedia.org/wiki/File:NYC_Public_Library_Research_Room_Jan_2006-1-_3.jpg) | Diliff | [CC BY 2.5](https://creativecommons.org/licenses/by/2.5) |
+| [Sanatorium du Basil, Stoumont](https://commons.wikimedia.org/wiki/File:Large_room_leading_to_the_kitchen_in_Sanatorium_du_Basil,_Stoumont,_Belgium_(DSCF3534-hdr).jpg) | Trougnouf | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0) |
+| [Warszawa Centralna train station](https://commons.wikimedia.org/wiki/File:Warszawa_Centralna_train_station,_2026,_Warsaw,_Poland.jpg) | Igor123121 | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0) |
+| [Restaurant in Place D'Youville, Quebec City](https://commons.wikimedia.org/wiki/File:Restaurant_in_Place_D%27Youville,_Quebec_City.jpg) | Wilfredor | [CC0](https://creativecommons.org/publicdomain/zero/1.0/) |
+| [Rue du Souterrain, Pérouges](https://commons.wikimedia.org/wiki/File:Rue_du_Souterrain_depuis_la_rue_des_Rondes_%C3%A0_P%C3%A9rouges_en_avril_2021.jpg) | Benoît Prieur | [CC0](https://creativecommons.org/publicdomain/zero/1.0/) |
+| [Frontenac Hotel, Quebec City](https://commons.wikimedia.org/wiki/File:Frontenac_Hotel,_Quebec_ville,_downtown_007.jpg) | Wilfredor | [CC0](https://creativecommons.org/publicdomain/zero/1.0/) |
+| [Courtyard of the Zappeion, Athens](https://commons.wikimedia.org/wiki/File:Courtyard_Zappeion_Athens,_Greece.jpg) | Jebulon | [CC0](https://creativecommons.org/publicdomain/zero/1.0/) |
+| [Old house, Margarita Island](https://commons.wikimedia.org/wiki/File:Old_house_typical_of_the_island_of_Margarita.jpg) | Wilfredor | [CC0](https://creativecommons.org/publicdomain/zero/1.0/) |
+| [Grande salle, École nationale des chartes](https://commons.wikimedia.org/wiki/File:Grande_salle_ENC_n1.jpg) | Marie-Lan Nguyen | [CC BY 2.5](https://creativecommons.org/licenses/by/2.5) |
+
+</details>
 
 ## Quick start
 

@@ -11,3 +11,5 @@ __pycache__/
 *.doppio/
 .DS_Store
 bench.json
+
+/showcase/
