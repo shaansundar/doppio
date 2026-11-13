@@ -1,0 +1,13 @@
+/bin/
+*.test
+*.out
+coverage.*
+
+worker/.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+*.doppio/
+.DS_Store
+bench.json
